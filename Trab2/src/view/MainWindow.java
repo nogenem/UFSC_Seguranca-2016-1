@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import model.NotPositiveInteger;
 import model.PrimitiveRoot;
 
 public class MainWindow implements ActionListener {
@@ -51,7 +50,7 @@ public class MainWindow implements ActionListener {
 	 * Create the application.
 	 */
 	public MainWindow() {
-		this.pr = new PrimitiveRoot();
+		this.pr = new PrimitiveRoot(this);
 		initialize();
 	}
 
@@ -109,6 +108,7 @@ public class MainWindow implements ActionListener {
 		southPanel.add(scrollPane, BorderLayout.CENTER);
 		
 		taResult = new JTextArea();
+		taResult.setEditable(false);
 		scrollPane.setViewportView(taResult);
 		
 		Component horizontalStrut_4 = Box.createHorizontalStrut(1);
@@ -123,29 +123,58 @@ public class MainWindow implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		try{
-			String input = tfInput.getText();
-			if(!isValidInput(input))
-				throw new NotPositiveInteger();
-			
-			BigInteger p = new BigInteger(input);
-			long inicio = System.currentTimeMillis();
-			Set<BigInteger> result = pr.getAllPrimitiveRoots(p);
-			long fim = System.currentTimeMillis();
-			
-			lblResult.setText(String.format("Result (%.2fs):", ((fim-inicio)/60.0)));
-			
-			String txt = result.toString();
-			txt = txt.substring(1, txt.length()-1);
-			txt = txt.replaceAll(", ", ",\n");
-			taResult.setText(txt);
-		}catch(Exception exc){
-			JOptionPane.showMessageDialog(frame, exc.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		lblResult.setText("Calculating...");
+		taResult.setText("");
+		
+		String input = tfInput.getText();
+		if(!isValidInput(input)){
+			showError("This isn't a positive integer.");
+			return;
 		}
+		
+		BigInteger p = new BigInteger(input);
+		pr.calculate(p);
 	}
 	
+	/**
+	 * Verifica se o input é um inteiro positivo.
+	 * 
+	 * @param input		Input para ser verificado.
+	 * @return			TRUE se o input for um inteiro positivo,
+	 * 			   </br>FALSE caso contrario.
+	 */
 	private boolean isValidInput(String input){
 		return input.matches("\\d+");//positive integer
+	}
+	
+	/**
+	 * Função chamada pela classe PrimitiveRoot
+	 *  após calcular as raízes primitivas de um 
+	 *  numero previamente passado a ela.
+	 * 
+	 * @param result	As raízes primitivas.
+	 * @param time		O tempo, em segundos, que levou para 
+	 * 					 realizar o calculo.
+	 */
+	public void setResult(Set<BigInteger> result, double time){
+		lblResult.setText(String.format("Result (%.2fs):", time));
+		
+		String txt = result.toString();
+		txt = txt.substring(1, txt.length()-1);
+		txt = txt.replaceAll(", ", ",\n");
+		taResult.setText(txt);	
+	}
+	
+	/**
+	 * Função chamada pela classe PrimitiveRoot
+	 *  caso ocorra um erro durante o calculo
+	 *  das raízes primitivas.
+	 * 
+	 * @param msg	Mensagem de erro.
+	 */
+	public void showError(String msg){
+		lblResult.setText("Result:");
+		JOptionPane.showMessageDialog(frame, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 }

@@ -5,13 +5,55 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PrimitiveRoot {
+import view.MainWindow;
+
+public class PrimitiveRoot implements Runnable {
 	
 	private static final BigInteger ZERO = BigInteger.ZERO;
 	private static final BigInteger ONE = BigInteger.ONE;
 	private static final BigInteger TWO = BigInteger.valueOf(2);
 	
-	public PrimitiveRoot(){
+	private Thread t;
+	private boolean running;
+	
+	private MainWindow window;
+	private BigInteger currentP;
+	
+	public PrimitiveRoot(MainWindow window){
+		this.window = window;
+		
+		this.running = false;
+		this.t = new Thread(this);
+		this.t.start();
+	}
+	
+	/**
+	 * Habilita a thread para calcular as raízes primitivas 
+	 *  modulo p.
+	 * 
+	 * @param p		Numero que se quer saber as raízes.
+	 */
+	public void calculate(BigInteger p){
+		this.currentP = p;
+		this.running = true;
+	}
+	
+	public void run(){
+		while(true){
+			while(!running){ Thread.yield(); }
+			try{
+				long inicio = System.currentTimeMillis();
+				// calcula as raízes
+				Set<BigInteger> result = getAllPrimitiveRoots(currentP);
+				long fim = System.currentTimeMillis();
+				// envia os resultados para a MainWindow
+				window.setResult(result, ((fim-inicio)/1000.0));
+			}catch(Exception e){
+				window.showError(e.getMessage());
+			}finally{
+				this.running = false;
+			}
+		}
 	}
 	
 	/**
@@ -87,7 +129,7 @@ public class PrimitiveRoot {
 	 * @return						Uma raiz primitiva modulo p.
 	 * @throws NotPrimeException	Caso o numero passado não seja primo.	
 	 */
-	public Set<BigInteger> getAllPrimitiveRoots(BigInteger p) throws Exception {
+	private Set<BigInteger> getAllPrimitiveRoots(BigInteger p) throws Exception {
 		if(!isPrime(p))
 			throw new NotPrimeException();
 		
