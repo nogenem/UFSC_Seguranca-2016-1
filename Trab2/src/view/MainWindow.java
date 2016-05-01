@@ -27,6 +27,7 @@ public class MainWindow implements ActionListener {
 	private JTextArea taResult;
 	private JFormattedTextField tfInput;
 	private JLabel lblResult;
+	private JButton btnCalculate;
 	
 	private PrimitiveRoot pr;
 
@@ -84,7 +85,7 @@ public class MainWindow implements ActionListener {
 		Component horizontalStrut_3 = Box.createHorizontalStrut(5);
 		northPanel.add(horizontalStrut_3);
 		
-		JButton btnCalculate = new JButton("Calculate");
+		btnCalculate = new JButton("Calculate");
 		btnCalculate.addActionListener(this);
 		northPanel.add(btnCalculate);
 		
@@ -125,6 +126,8 @@ public class MainWindow implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		lblResult.setText("Calculating...");
 		taResult.setText("");
+		tfInput.setEnabled(false);
+		btnCalculate.setEnabled(false);
 		
 		String input = tfInput.getText();
 		if(!isValidInput(input)){
@@ -162,7 +165,10 @@ public class MainWindow implements ActionListener {
 		String txt = result.toString();
 		txt = txt.substring(1, txt.length()-1);
 		txt = txt.replaceAll(", ", ",\n");
-		taResult.setText(txt);	
+		taResult.setText(txt);
+		
+		tfInput.setEnabled(true);
+		btnCalculate.setEnabled(true);
 	}
 	
 	/**
