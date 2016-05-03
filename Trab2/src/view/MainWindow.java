@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import model.PrimitiveRoot;
+import java.awt.FlowLayout;
 
 public class MainWindow implements ActionListener {
 
@@ -27,7 +28,8 @@ public class MainWindow implements ActionListener {
 	private JTextArea taResult;
 	private JFormattedTextField tfInput;
 	private JLabel lblResult;
-	private JButton btnCalculate;
+	private JButton btnCalculateOne;
+	private JButton btnCalculateAll;
 	
 	private PrimitiveRoot pr;
 
@@ -61,36 +63,8 @@ public class MainWindow implements ActionListener {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Primitive Root Modulo n");
-		BorderLayout borderLayout = (BorderLayout) frame.getContentPane().getLayout();
-		borderLayout.setVgap(5);
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		JPanel northPanel = new JPanel();
-		frame.getContentPane().add(northPanel, BorderLayout.NORTH);
-		northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.X_AXIS));
-		
-		Component horizontalStrut = Box.createHorizontalStrut(5);
-		northPanel.add(horizontalStrut);
-		
-		JLabel lblInput = new JLabel("Input:");
-		northPanel.add(lblInput);
-		
-		Component horizontalStrut_2 = Box.createHorizontalStrut(5);
-		northPanel.add(horizontalStrut_2);
-		
-		tfInput = new JFormattedTextField();
-		northPanel.add(tfInput);
-		
-		Component horizontalStrut_3 = Box.createHorizontalStrut(5);
-		northPanel.add(horizontalStrut_3);
-		
-		btnCalculate = new JButton("Calculate");
-		btnCalculate.addActionListener(this);
-		northPanel.add(btnCalculate);
-		
-		Component horizontalStrut_1 = Box.createHorizontalStrut(5);
-		northPanel.add(horizontalStrut_1);
 		
 		JPanel southPanel = new JPanel();
 		frame.getContentPane().add(southPanel, BorderLayout.CENTER);
@@ -120,23 +94,60 @@ public class MainWindow implements ActionListener {
 		
 		Component verticalStrut = Box.createVerticalStrut(7);
 		southPanel.add(verticalStrut, BorderLayout.SOUTH);
+		
+		JPanel northPanel = new JPanel();
+		frame.getContentPane().add(northPanel, BorderLayout.NORTH);
+		northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
+		
+		JPanel panel1 = new JPanel();
+		northPanel.add(panel1);
+		panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+		
+		Component horizontalStrut = Box.createHorizontalStrut(5);
+		panel1.add(horizontalStrut);
+		
+		JLabel lblInput = new JLabel("Input:");
+		panel1.add(lblInput);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(5);
+		panel1.add(horizontalStrut_2);
+		
+		tfInput = new JFormattedTextField();
+		panel1.add(tfInput);
+		
+		Component horizontalStrut_1 = Box.createHorizontalStrut(5);
+		panel1.add(horizontalStrut_1);
+		
+		JPanel panel2 = new JPanel();
+		northPanel.add(panel2);
+		panel2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		btnCalculateOne = new JButton("Calculate One");
+		btnCalculateOne.addActionListener(this);
+		panel2.add(btnCalculateOne);
+		
+		btnCalculateAll = new JButton("Calculate All");
+		btnCalculateAll.addActionListener(this);
+		panel2.add(btnCalculateAll);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		lblResult.setText("Calculating...");
-		taResult.setText("");
-		tfInput.setEnabled(false);
-		btnCalculate.setEnabled(false);
-		
 		String input = tfInput.getText();
 		if(!isValidInput(input)){
 			showError("This isn't a positive integer.");
 			return;
 		}
 		
+		// Trava a interface
+		lblResult.setText("Calculating...");
+		taResult.setText("");
+		tfInput.setEnabled(false);
+		btnCalculateOne.setEnabled(false);
+		btnCalculateAll.setEnabled(false);
+		
 		BigInteger p = new BigInteger(input);
-		pr.calculate(p);
+		pr.calculate(p, (e.getActionCommand() == "Calculate All"));
 	}
 	
 	/**
@@ -167,8 +178,10 @@ public class MainWindow implements ActionListener {
 		txt = txt.replaceAll(", ", ",\n");
 		taResult.setText(txt);
 		
+		// Destrava a interface
 		tfInput.setEnabled(true);
-		btnCalculate.setEnabled(true);
+		btnCalculateOne.setEnabled(true);
+		btnCalculateAll.setEnabled(true);
 	}
 	
 	/**
@@ -180,6 +193,12 @@ public class MainWindow implements ActionListener {
 	 */
 	public void showError(String msg){
 		lblResult.setText("Result:");
+		
+		//Destrava a interface
+		tfInput.setEnabled(true);
+		btnCalculateOne.setEnabled(true);
+		btnCalculateAll.setEnabled(true);
+		
 		JOptionPane.showMessageDialog(frame, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
