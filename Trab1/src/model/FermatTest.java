@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 public class FermatTest {
 	
+	private static final BigInteger ONE = BigInteger.ONE;
 	private XORShift random;
 	
 	public FermatTest(){
@@ -33,14 +34,14 @@ public class FermatTest {
 		if(n.intValue() % 2 == 0)
 			return false;
 		
-		BigInteger n1 = n.subtract(BigInteger.ONE), a = null;
-		long r = 0;
+		BigInteger n1 = n.subtract(ONE), a = null;
 		for(int i = 0; i<maxInteration; i++){
-			r = Math.abs(random.nextLong());//Numero aleatório
-			r = r % (n.longValue()-1) + 1;//[1, n-1]
-			a = BigInteger.valueOf(r);
-			// a ^ n-1 % n != 1
-			if(a.modPow(n1, n).compareTo(BigInteger.ONE) != 0)
+			// Numero aleatório com nbits
+			a = new BigInteger(n.bitLength(), random).abs();
+			// a % (n-1) + 1 => Limita em [1, n-1]
+			a = a.mod( n.subtract(ONE) ).add(ONE);
+			// a ^ (n-1) % n != 1
+			if(a.modPow(n1, n).compareTo(ONE) != 0)
 				return false;
 		}
 		return true;

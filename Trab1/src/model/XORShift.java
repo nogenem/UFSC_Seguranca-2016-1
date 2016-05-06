@@ -1,6 +1,9 @@
 package model;
 
-public class XORShift {
+import java.util.Random;
+
+@SuppressWarnings("serial")
+public class XORShift extends Random {
 	
 	private long x;
 	
@@ -9,20 +12,23 @@ public class XORShift {
 	}
 	
 	public XORShift(long seed){
+		super(seed);
 		this.x = seed;
 	}
 	
 	/**
-	 * Gera um numero long aleatório com n bits.
-	 * 
-	 * @param nbits		Quantidade de bits do numero gerado.
-	 * @return			Numero aleatorio com nbits.
+	 * Função que gera o proximo numero aleatório para ser usado
+	 *  na maioria das outras funções da classe Random.
+	 *  
+	 *  @param bits		Numero de bits do numero gerado.
+	 *  @return			Inteiro aleatório com n bits.
 	 */
-	public long nextLong(int nbits){
-		long x = nextLong();
-		//Deslocamento em nbits
-		x &= ((1L << nbits) -1);
-		return x;
+	@Override
+	protected int next(int bits) {
+		long x = this.nextLong();
+		//Deslocamento em bits
+		x &= ((1L << bits) -1);
+		return (int) x;
 	}
 	
 	/**
@@ -31,6 +37,7 @@ public class XORShift {
 	 * 
 	 * @return	Numero aleatório.
 	 */
+	@Override
 	public long nextLong(){
 		x ^= (x << 21);
 	    x ^= (x >>> 35);
